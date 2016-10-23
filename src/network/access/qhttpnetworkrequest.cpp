@@ -355,7 +355,6 @@ int QHttpNetworkRequest::minorVersion() const
     return 1;
 }
 
-
 QT_END_NAMESPACE
 
 #endif

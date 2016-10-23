@@ -988,20 +988,39 @@ void QNetworkHeadersPrivate::setCookedHeader(QNetworkRequest::KnownHeaders heade
 void QNetworkHeadersPrivate::setRawHeaderInternal(const QByteArray &key, const QByteArray &value)
 {
     RawHeadersList::Iterator it = rawHeaders.begin();
+    int index = 0;
+    bool found = false;
     while (it != rawHeaders.end()) {
-        if (qstricmp(it->first.constData(), key.constData()) == 0)
+        if (qstricmp(it->first.constData(), key.constData()) == 0) {
+            found = true;
             it = rawHeaders.erase(it);
-        else
+        }
+        else {
+            if (!found)
+                index++;
             ++it;
+        }
     }
 
-    if (value.isNull())
+    QList<QByteArray> predefinedHeaders = {
+        "Host",
+        "Connection",
+        "Proxy-Connection",
+        "Accept-Encoding",
+        "Accept-Language"
+    };
+
+    if (value.isNull() && predefinedHeaders.indexOf(key) < 0)
         return;                 // only wanted to erase key
 
     RawHeaderPair pair;
     pair.first = key;
     pair.second = value;
-    rawHeaders.append(pair);
+    if (index >=0) {
+        rawHeaders.insert(index, pair);
+    } else {
+        rawHeaders.append(pair);
+    }
 }
 
 void QNetworkHeadersPrivate::parseAndSetHeader(const QByteArray &key, const QByteArray &value)

@@ -98,13 +98,24 @@ QList<QByteArray> QHttpNetworkHeaderPrivate::headerFieldValues(const QByteArray 
 void QHttpNetworkHeaderPrivate::setHeaderField(const QByteArray &name, const QByteArray &data)
 {
     QList<QPair<QByteArray, QByteArray> >::Iterator it = fields.begin();
+    int index = 0;
+    bool found = false;
     while (it != fields.end()) {
-        if (qstricmp(name.constData(), it->first) == 0)
+        if (qstricmp(name.constData(), it->first) == 0) {
+            found = true;
             it = fields.erase(it);
-        else
+        }
+        else {
+            if (!found)
+                index++;
             ++it;
+        }
     }
-    fields.append(qMakePair(name, data));
+    if (index >= 0) {
+        fields.insert(index, qMakePair(name, data));
+    } else {
+        fields.append(qMakePair(name, data));
+    }
 }
 
 bool QHttpNetworkHeaderPrivate::operator==(const QHttpNetworkHeaderPrivate &other) const
