@@ -2578,14 +2578,11 @@ void QPdfEnginePrivate::drawTextItem(const QPointF &p, const QTextItemInt &ti)
     QFontEngine::FaceId face_id = fe->faceId();
     bool noEmbed = false;
     if (!embedFonts
-        || face_id.filename.isEmpty()
         || fe->fsType & 0x200 /* bitmap embedding only */
         || fe->fsType == 2 /* no embedding allowed */) {
         *currentPage << "Q\n";
         q->QPaintEngine::drawTextItem(p, ti);
         *currentPage << "q\n";
-        if (face_id.filename.isEmpty())
-            return;
         noEmbed = true;
     }
 
